@@ -98,16 +98,12 @@ __autocomplete () {
 }
 
 run () {
-	if opt help; then
-		print-help
-		return 0
-	fi
-	if [ "$CMD" = "autocomplete" ]; then
-		printf "$autocompletetemplate" $0
-		return 0
-	fi
 	if [ "$CMD" = "__autocomplete" ]; then
 		__autocomplete | grep "^$COMP_CUR"
+		return 0
+	fi
+	if opt help; then
+		print-help
 		return 0
 	fi
 	if silent type cmd-$CMD; then
@@ -135,7 +131,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		app_filename=$(basename $1)
 		local tmp=$(echo $app_filename | sed 's/.sh//')
 		app_bin=${opt_app-$tmp}
-		opt force || [ -e $BASHKIT_BIN/$app ] && error 1 app already exists
+		opt force || [ -e $BASHKIT_BIN/$app_bin ] && error 1 app already exists
 	}
 
 	link-app () {
