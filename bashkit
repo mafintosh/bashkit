@@ -147,7 +147,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		link-app
 	}
 
-	tab-remove-1 () {
+	tab-uninstall-1 () {
 		ls $BASHKIT_BIN | grep -v bashkit
 	}
 
