@@ -135,7 +135,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		app_filename=$(basename $1)
 		local tmp=$(echo $app_filename | sed 's/.sh//')
 		app_bin=${opt_app-$tmp}
-		[ ! opt force ] && [ -e $BASHKIT_BIN/$app ] && error 1 app already exists
+		opt force || [ -e $BASHKIT_BIN/$app ] && error 1 app already exists
 	}
 
 	link-app () {
@@ -143,10 +143,9 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-link () { # Link a script for development. --app to specify bin name
-		init-app
+		init-app $1
 		local link=$BASHKIT_BIN/$app_bin
 		cd $(dirname $1)
-		rm -f $link
 		ln -s $PWD/$app_filename $link
 		chmod +x $PWD/$app_filename
 		link-app
@@ -161,13 +160,13 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-uninstall () { # Remove a previously installed or linked app
-		local link=$BASHKIT_BIN/$0
+		local link=$BASHKIT_BIN/$1
 		[ ! -e $link ] && error 1 app not found
 		rm -f $link
 	}
 
 	cmd-install () { # Installs an app from a filename or url. --app to specify bin name
-		init-app
+		init-app $1
 		if [ -e $1 ]; then
 			cp $1 $BASHKIT_BIN/$app_bin
 		else
