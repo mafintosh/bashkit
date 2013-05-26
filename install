@@ -3,6 +3,8 @@
 BASHKIT_INSTALL="$HOME/.bashkit"
 BASHKIT_REPO=/Users/maf/projects/bashkit
 
+[ -e $BASHKIT_INSTALL ] && echo already installed && exit 0
+
 git clone $BASHKIT_REPO $BASHKIT_INSTALL
 mkdir -p $BASHKIT_INSTALL/bin
 
@@ -10,3 +12,8 @@ ln -s $BASHKIT_INSTALL/bashkit $BASHKIT_INSTALL/bin/bashkit
 
 BASH_PROFILE="$HOME/.bashrc"
 [ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bash_profile"
+
+cat $BASH_PROFILE 2> /dev/null | grep "## bashkit installation ##" > /dev/null && echo already linked && exit 0
+
+printf '\n## bashkit installation ##\n. %s\n' $BASHKIT_INSTALL/bashrc >> $BASH_PROFILE
+echo installation complete

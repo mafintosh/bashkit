@@ -124,16 +124,48 @@ run () {
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
-	cmd-link () { # Link a script for development
-		:
+	BASHKIT_BIN=$(dirname $0)
+	opt app a
+	opt force f
+
+	init-app () {
+		app_filename=$(basename $1)
+		local tmp=echo $app_filename | sed 's/.sh'
+		app_bin=${opt_app-$app_filename}
+		[ ! opt force ] && [ -e $BASHKIT_BIN/$app ] && error 1 app already exists
+	}
+
+	link-app () {
+		silent type _bashkit_completion_add && _bashkit_completion_add $app_bin
+	}
+
+	cmd-link () { # Link a script for development. --app to specify bin name
+		init-app
+		local link=$BASHKIT_BIN/$app_bin
+		cd $(dirname $1)
+		rm -f $link
+		ln -s $PWD/$app_filename $link
+		link-app
+	}
+
+	tab-remove-1 () {
+		ls $BASHKIT_BIN | grep -v bashkit
 	}
 
 	cmd-remove () { # Remove a previously installed or linked app
-		:
+		local link=$BASHKIT_BIN/$0
+		[ ! -e $link ] && error 1 app not found
+		rm -f $link
 	}
 
-	cmd-install () { # Installs an app from a filename or url
-		echo yo i am installing $1
+	cmd-install () { # Installs an app from a filename or url. --app to specify bin name
+		init-app
+		if [ -e $1 ]; then
+			cp $1 $BASHKIT_BIN/$app_bin
+		else
+			curl $1 > $BASHKIT_BIN/$app_bin
+		fi
+		link-app
 	}
 
 	cmd-path () { # Print the include path of bashkit
