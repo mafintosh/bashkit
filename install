@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BASHKIT_INSTALL="$HOME/.bashkit"
+BASHKIT_REPO=/Users/maf/projects/bashkit
+
+git clone $BASHKIT_REPO $BASHKIT_INSTALL
+mkdir -p $BASHKIT_INSTALL/bin
+
+ln -s $BASHKIT_INSTALL/bashkit $BASHKIT_INSTALL/bin/bashkit
+
+BASH_PROFILE="$HOME/.bashrc"
+[ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bash_profile"

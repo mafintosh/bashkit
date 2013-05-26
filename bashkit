@@ -1,0 +1,144 @@
+#!/bin/bash
+
+CWD="$PWD"
+ARGV="$*"
+ARGV_LIST=($*)
+LONG_OPTS=()
+CMD=$1
+
+cd $(dirname $(readlink $0 || echo $0))
+DIRNAME=$PWD
+FILENAME=$DIRNAME/$(basename $(readlink $0 || echo $0))
+cd $CWD
+
+silent () {
+	$* > /dev/null 2> /dev/null
+	return $?
+}
+
+error () {
+	echo ${@:2}
+	exit $1 >&2
+}
+
+opt () {
+	declare -p opt_$1 > /dev/null 2> /dev/null && return 0
+	local found=false
+	LONG_OPTS+=(--$1)
+	[ "$2" != "" ] && printf -v opt_alias_$2 $1
+	for arg in $ARGV; do
+		$found && [ "${arg:0:1}" != "-" ] && printf -v opt_$1 $arg
+		$found && break
+		if [ "--$1" = "$arg" ] || ([ "$2" != "" ] && [ "-$2" = "$arg" ]); then
+			found=true
+			printf -v opt_$1 true
+		fi
+	done
+	$found && return 0 || return 1
+}
+
+print-help () {
+	local app=$(basename $0)
+	local cmds=$(__commands)
+	local max=0
+
+	for cmd in $cmds; do
+		[ ${#cmd} -gt $max ] && max=${#cmd}
+	done
+	(
+		if [ $max = 0 ]; then
+			printf "usage %s <options>\n" $app
+		else
+			printf "usage: %s <command> [<options>]\n\n" $app
+			printf "The available commands are\n"
+			for cmd in $cmds; do
+				local msg=$(cat $FILENAME | grep cmd-$cmd.\*\# | sed 's/.*#[ ]*//')
+				printf "   %-${max}s   %s\n" $cmd "$msg"
+			done
+			printf "\nRunning '%s --help' will print this message\n" $app
+		fi
+	) >&2
+}
+
+__commands () {
+	declare -F | grep 'cmd-' | sed 's/.*cmd-//' | sed 's/ .*//'
+	return $?
+}
+
+__autocompletelist () {
+	if silent type $*; then
+		for word in $($*); do
+			echo $word
+		done
+		exit 0
+	fi
+}
+__autocomplete () {
+	if [ "${COMP_CUR:0:2}" = "--" ]; then
+		for opt in ${LONG_OPTS[@]}; do
+			echo $opt
+		done
+		exit 0
+	fi
+	if [ "${COMP_PREV:0:1}" = "-" ] && [ "${#COMP_PREV}" = 2 ]; then
+		local opt_alias=opt_alias_${COMP_PREV:1}
+		COMP_PREV="--${!opt_alias}"
+	fi
+	if [ "${COMP_PREV:0:2}" = "--" ]; then
+		__autocompletelist tab-${COMP_PREV:2}
+		exit 0
+	fi
+
+	__autocompletelist tab-$COMP_CWORD
+	__autocompletelist tab-$COMP_PREV-$(($COMP_CWORD-1))
+
+	[ $COMP_CWORD = 1 ] && __commands && exit 0
+
+	__autocompletelist tab
+}
+
+run () {
+	if opt help; then
+		print-help
+		return 0
+	fi
+	if [ "$CMD" = "autocomplete" ]; then
+		printf "$autocompletetemplate" $0
+		return 0
+	fi
+	if [ "$CMD" = "__autocomplete" ]; then
+		__autocomplete | grep "^$COMP_CUR"
+		return 0
+	fi
+	if silent type cmd-$CMD; then
+		cmd-$CMD ${ARGV_LIST[@]:1}
+		return $?
+	fi
+	if silent type cmd; then
+		cmd $*
+		return $?
+	fi
+
+	print-help
+	return 1
+}
+
+if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
+	cmd-link () { # Link a script for development
+		:
+	}
+
+	cmd-remove () { # Remove a previously installed or linked app
+		:
+	}
+
+	cmd-install () { # Installs an app from a filename or url
+		echo yo i am installing $1
+	}
+
+	cmd-path () { # Print the include path of bashkit
+		echo $FILENAME
+	}
+
+	run
+fi
