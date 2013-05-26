@@ -11,12 +11,9 @@ Run the following command to install bashkit
 This will install a commandline tool called `bashkit`.
 Run `bashkit` to print all available options
 
-## Usage
+## My first app
 
 After you installed `bashkit` you can start making your own command-line apps.
-
-### My first app
-
 The following program will print hello world
 
 ``` sh
@@ -34,9 +31,9 @@ run # call run to bootstrap the program
 Save the following file as `my-first-app` and run `bashkit link my-first-app` in the same folder.
 Afterwards you should be able to run `my-first-app hello` in your terminal and it should print `hello world`
 
-Similary you could a route called `hi` by defining a `cmd-hi` method
+Similary you could a add a command called `hi` by defining a `cmd-hi` method
 
-### Adding options
+## Adding options
 
 You can add command-line options by using the `opt` function
 
@@ -56,7 +53,7 @@ run
 
 Running the above program with `my-first-app hello --world world` will print `hello world`
 
-### Autocompletion
+## Autocompletion
 
 All linked apps features autocompletion of commands and options.
 This means that typing `my-first-app <tab><tab>` in the terminal will print out available options
