@@ -133,8 +133,8 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	init-app () {
 		app_filename=$(basename $1)
-		local tmp=echo $app_filename | sed 's/.sh'
-		app_bin=${opt_app-$app_filename}
+		local tmp=$(echo $app_filename | sed 's/.sh//')
+		app_bin=${opt_app-$tmp}
 		[ ! opt force ] && [ -e $BASHKIT_BIN/$app ] && error 1 app already exists
 	}
 
@@ -148,6 +148,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		cd $(dirname $1)
 		rm -f $link
 		ln -s $PWD/$app_filename $link
+		chmod +x $PWD/$app_filename
 		link-app
 	}
 
@@ -172,6 +173,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		else
 			curl $1 > $BASHKIT_BIN/$app_bin
 		fi
+		chmod +x $BASHKIT_BIN/$app_bin
 		link-app
 	}
 
