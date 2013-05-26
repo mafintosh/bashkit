@@ -124,9 +124,12 @@ run () {
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
-	BASHKIT_BIN=$(dirname $0)
+	BASHKIT_INSTALL="$HOME/.bashkit"
+	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
 	opt app a
 	opt force f
+
+	opt force || [ $(whoami) = "root" ] && error 1 you are sudo. use --force to continue
 
 	init-app () {
 		app_filename=$(basename $1)
@@ -152,7 +155,11 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		ls $BASHKIT_BIN | grep -v bashkit
 	}
 
-	cmd-remove () { # Remove a previously installed or linked app
+	cmd-selfdestruct () { # Remove bashkit from this machine
+		rm -rf $BASHKIT_INSTALL
+	}
+
+	cmd-uninstall () { # Remove a previously installed or linked app
 		local link=$BASHKIT_BIN/$0
 		[ ! -e $link ] && error 1 app not found
 		rm -f $link
@@ -166,6 +173,11 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 			curl $1 > $BASHKIT_BIN/$app_bin
 		fi
 		link-app
+	}
+
+	cmd-selfupdate () { # Upgrade bashkit to the newest available version
+		cd $BASHKIT_INSTALL
+		git pull
 	}
 
 	cmd-path () { # Print the include path of bashkit
