@@ -148,25 +148,21 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	init-app () {
 		app_filename=$(basename $1)
-		local tmp=$(echo $app_filename | sed 's/.sh//')
+		local tmp=${app_filename/.sh/}
 		app_bin=${opt_bin-$tmp}
-		opt --force || [ -e $BASHKIT_BIN/$app_bin ] && error app already exists
-	}
-
-	link-app () {
-		silent type _bashkit_completion_add && _bashkit_completion_add $app_bin
+		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already exists
 	}
 
 	cmd-link () { # Link a script for development. --app to specify bin name
 		init-app $1
 		local link=$BASHKIT_BIN/$app_bin
 		cd $(dirname $1)
+		rm -f $link
 		ln -s $PWD/$app_filename $link
 		chmod +x $PWD/$app_filename
-		link-app
 	}
 
-	cmd-ls () {
+	cmd-ls () { # List all installed apps
 		ls $BASHKIT_BIN | grep -v bashkit
 	}
 
@@ -192,7 +188,6 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 			curl $1 > $BASHKIT_BIN/$app_bin
 		fi
 		chmod +x $BASHKIT_BIN/$app_bin
-		link-app
 	}
 
 	cmd-selfupdate () { # Upgrade bashkit to the newest available version
