@@ -3,7 +3,7 @@
 CWD="$PWD"
 ARGV="$*"
 ARGV_LIST=($*)
-LONG_OPTS=()
+OPTS=()
 CMD=$1
 
 cd $(dirname $(readlink $0 || echo $0))
@@ -21,20 +21,36 @@ error () {
 	exit $1 >&2
 }
 
-opt () {
-	declare -p opt_$1 > /dev/null 2> /dev/null && return 0
+not () {
+	$* && return 1 || return 0
+}
+
+opt-find () {
+	local name=opt_${1//-/}
 	local found=false
-	LONG_OPTS+=(--$1)
-	[ "$2" != "" ] && printf -v opt_alias_$2 $1
-	for arg in $ARGV; do
-		$found && [ "${arg:0:1}" != "-" ] && printf -v opt_$1 $arg
-		$found && break
-		if [ "--$1" = "$arg" ] || ([ "$2" != "" ] && [ "-$2" = "$arg" ]); then
-			found=true
-			printf -v opt_$1 true
-		fi
+	for opt in $*; do
+		for arg in ${ARGV_LIST[@]}; do
+			[ "$opt" = "$arg" ] && found=true && printf -v $name true && continue
+			$found && [ "${arg:0:1}" = "-" ] && break 2
+			$found && printf -v $name $arg && break 2
+		done
 	done
 	$found && return 0 || return 1
+}
+
+opt () {
+	if [ "${1:0:1}" != "-" ]; then
+		[ "${ARGV[1]}" != "$1" ] && return 1
+		shift
+	fi
+	local name=opt_${1//-/}
+	[ $# = 1 ] && [ "${!name}" != "" ] && return 0
+	OPTS+=(${@//,[^ ]*/})
+	for group in $*; do
+		local IFS=","
+		opt-find $group
+	done
+	return $?
 }
 
 print-help () {
@@ -75,7 +91,7 @@ __autocompletelist () {
 }
 __autocomplete () {
 	if [ "${COMP_CUR:0:2}" = "--" ]; then
-		for opt in ${LONG_OPTS[@]}; do
+		for opt in ${OPTS[@]}; do
 			echo $opt
 		done
 		exit 0
@@ -122,16 +138,17 @@ run () {
 if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	BASHKIT_INSTALL="$HOME/.bashkit"
 	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
-	opt app a
-	opt force f
 
-	opt force || [ $(whoami) = "root" ] && error 1 you are sudo. use --force to continue
+	opt --app,-a
+	opt --force,-f
+
+	[ "$(whoami)" = "root" ] && not opt --force && error 1 you are sudo. use --force to continue
 
 	init-app () {
 		app_filename=$(basename $1)
 		local tmp=$(echo $app_filename | sed 's/.sh//')
 		app_bin=${opt_app-$tmp}
-		opt force || [ -e $BASHKIT_BIN/$app_bin ] && error 1 app already exists
+		opt --force || [ -e $BASHKIT_BIN/$app_bin ] && error 1 app already exists
 	}
 
 	link-app () {
