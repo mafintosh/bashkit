@@ -26,14 +26,18 @@ not () {
 }
 
 opt-find () {
-	local name=opt_${1//-/}
+	local name=${1//-/}
+	local opt_name=opt_$name
 	local found=false
 	for opt in $*; do
 		for arg in ${ARGV_LIST[@]}; do
-			[ "$opt" = "$arg" ] && found=true && printf -v $name true && continue
+			[ "$opt" = "$arg" ] && found=true && printf -v $opt_name true && continue
 			$found && [ "${arg:0:1}" = "-" ] && break 2
-			$found && printf -v $name $arg && break 2
+			$found && printf -v $opt_name $arg && break 2
 		done
+	done
+	for alias in ${@:2}; do
+		printf -v opt_alias_${alias//-/} $name
 	done
 	$found && return 0 || return 1
 }
@@ -90,7 +94,7 @@ __autocompletelist () {
 	fi
 }
 __autocomplete () {
-	if [ "${COMP_CUR:0:2}" = "--" ]; then
+	if [ "${COMP_CUR:0:1}" = "-" ]; then
 		for opt in ${OPTS[@]}; do
 			[ "$opt" != "--autocomplete" ] && echo $opt
 		done
@@ -105,8 +109,8 @@ __autocomplete () {
 		exit 0
 	fi
 
-	__autocompletelist tab-$COMP_CWORD
 	__autocompletelist tab-$COMP_PREV-$(($COMP_CWORD-1))
+	__autocompletelist tab-$COMP_CWORD
 
 	[ "$COMP_CWORD" = "1" ] && __commands && exit 0
 
