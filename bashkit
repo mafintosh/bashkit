@@ -153,7 +153,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already exists
 	}
 
-	cmd-link () { # Link a script for development. --app to specify bin name
+	cmd-link () { # Link a script for development.
 		init-app $1
 		local link=$BASHKIT_BIN/$app_bin
 		cd $(dirname $1)
@@ -180,7 +180,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		rm -f $link
 	}
 
-	cmd-install () { # Installs an app from a filename or url. --app to specify bin name
+	cmd-install () { # Installs an app from a filename or url.
 		init-app $1
 		if [ -e $1 ]; then
 			cp $1 $BASHKIT_BIN/$app_bin
