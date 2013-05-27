@@ -51,7 +51,8 @@ cmd-hello () {
 run
 ```
 
-Running the above program with `my-first-app hello --world world` will print `hello world`
+Running the above program with `my-first-app hello --world world` will print `hello world`.
+If you wanted to make a program with no commands you would just use the `cmd () { ... }` method instead
 
 ## Autocompletion
 
