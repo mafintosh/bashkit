@@ -15,5 +15,5 @@ BASH_PROFILE="$HOME/.bashrc"
 
 cat $BASH_PROFILE 2> /dev/null | grep "## bashkit installation ##" > /dev/null && echo already linked && exit 0
 
-printf '\n## bashkit installation ##\n. %s\n' $BASHKIT_INSTALL/bashrc >> $BASH_PROFILE
+printf '\n## bashkit installation ##\n[ -e %s ] && . %s\n' $BASHKIT_INSTALL/bashrc $BASHKIT_INSTALL/bashrc >> $BASH_PROFILE
 echo installation complete
