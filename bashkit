@@ -17,8 +17,8 @@ silent () {
 }
 
 error () {
-	echo ${@:2}
-	exit $1 >&2
+	echo $* >&2
+	exit 1
 }
 
 not () {
@@ -40,7 +40,7 @@ opt-find () {
 
 opt () {
 	if [ "${1:0:1}" != "-" ]; then
-		[ "${ARGV[1]}" != "$1" ] && return 1
+		[ "$CMD" != "$1" ] && return 1
 		shift
 	fi
 	local name=opt_${1//-/}
@@ -92,7 +92,7 @@ __autocompletelist () {
 __autocomplete () {
 	if [ "${COMP_CUR:0:2}" = "--" ]; then
 		for opt in ${OPTS[@]}; do
-			echo $opt
+			[ "$opt" != "--autocomplete" ] && echo $opt
 		done
 		exit 0
 	fi
@@ -108,17 +108,17 @@ __autocomplete () {
 	__autocompletelist tab-$COMP_CWORD
 	__autocompletelist tab-$COMP_PREV-$(($COMP_CWORD-1))
 
-	[ $COMP_CWORD = 1 ] && __commands && exit 0
+	[ "$COMP_CWORD" = "1" ] && __commands && exit 0
 
 	__autocompletelist tab
 }
 
 run () {
-	if [ "$CMD" = "__autocomplete" ]; then
+	if opt --autocomplete; then
 		__autocomplete | grep "^$COMP_CUR"
 		return 0
 	fi
-	if opt help; then
+	if opt --help; then
 		print-help
 		return 0
 	fi
@@ -136,19 +136,17 @@ run () {
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
-	BASHKIT_INSTALL="$HOME/.bashkit"
 	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
 
-	opt --app,-a
-	opt --force,-f
+	opt --bin,-b --force,-f
 
-	[ "$(whoami)" = "root" ] && not opt --force && error 1 you are sudo. use --force to continue
+	[ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
 
 	init-app () {
 		app_filename=$(basename $1)
 		local tmp=$(echo $app_filename | sed 's/.sh//')
-		app_bin=${opt_app-$tmp}
-		opt --force || [ -e $BASHKIT_BIN/$app_bin ] && error 1 app already exists
+		app_bin=${opt_bin-$tmp}
+		opt --force || [ -e $BASHKIT_BIN/$app_bin ] && error app already exists
 	}
 
 	link-app () {
@@ -178,7 +176,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	cmd-uninstall () { # Remove a previously installed or linked app
 		local link=$BASHKIT_BIN/$1
-		[ ! -e $link ] && error 1 app not found
+		[ ! -e $link ] && error app not found
 		rm -f $link
 	}
 
