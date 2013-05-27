@@ -32,6 +32,7 @@ Save the following file as `my-first-app` and run `bashkit link my-first-app` in
 Afterwards you should be able to run `my-first-app hello` in your terminal and it should print `hello world`
 
 Similary you could a add a command called `hi` by defining a `cmd-hi` method
+If you wanted to make a program with no commands you would just use the `cmd () { ... }` method instead
 
 ## Adding options
 
@@ -41,10 +42,11 @@ You can add command-line options by using the `opt` function
 #!/bin/bash
 . $(bashkit path) # include bashkit in this program
 
-opt world w # lets add a --world (-w for short) option to our
+opt --test,-t # a --test option for all commands
+opt hello --world,-w # lets add a --world (-w for short) option to our hello command
 
 cmd-hello () {
-	opt world || exit 1 # if --world is not set exit
+	opt --world || exit 1 # if --world or -w is not set exit
 	echo hello $opt_world # the world argument is available in through a env var
 }
 
@@ -52,7 +54,6 @@ run
 ```
 
 Running the above program with `my-first-app hello --world world` will print `hello world`.
-If you wanted to make a program with no commands you would just use the `cmd () { ... }` method instead
 
 ## Autocompletion
 
