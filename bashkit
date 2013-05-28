@@ -25,7 +25,13 @@ not () {
 	$* && return 1 || return 0
 }
 
+opt-find-def () {
+	local IFS=","
+	opt-find ${2--} $1
+}
+
 opt-find () {
+	local default=$1 && shift
 	local name=${1//-/}
 	local opt_name=opt_$name
 	local found=false
@@ -39,7 +45,9 @@ opt-find () {
 	for alias in ${@:2}; do
 		printf -v opt_alias_${alias//-/} $name
 	done
-	$found && return 0 || return 1
+	$found && return 0
+	[ "$default" != "-" ] && printf -v $opt_name $default && return 0
+	return 1
 }
 
 opt () {
@@ -51,8 +59,8 @@ opt () {
 	[ $# = 1 ] && [ "${!name}" != "" ] && return 0
 	OPTS+=(${@//,[^ ]*/})
 	for group in $*; do
-		local IFS=","
-		opt-find $group
+		local IFS="="
+		opt-find-def $group
 	done
 	return $?
 }
@@ -153,7 +161,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already exists
 	}
 
-	cmd-link () { # Link a script for development.
+	cmd-link () { # Link a script for development
 		init-app $1
 		local link=$BASHKIT_BIN/$app_bin
 		cd $(dirname $1)
@@ -180,7 +188,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		rm -f $link
 	}
 
-	cmd-install () { # Installs an app from a filename or url.
+	cmd-install () { # Installs an app from a filename or url
 		init-app $1
 		if [ -e $1 ]; then
 			cp $1 $BASHKIT_BIN/$app_bin
