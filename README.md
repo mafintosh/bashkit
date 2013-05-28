@@ -76,7 +76,7 @@ tab-world () {
 }
 
 cmd-hello () {
-	opt world || exit 1 # if --world is not set exit
+	opt --world || exit 1 # if --world is not set exit
 	echo hello $opt_world # the world argument is available in through a env var
 }
 
