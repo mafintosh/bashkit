@@ -68,7 +68,7 @@ to define a custom tab completion method.
 #!/bin/bash
 . $(bashkit path) # include bashkit in this program
 
-opt world w # lets add a --world (-w for short) option to our program
+opt --world,-w # lets add a --world (-w for short) option to our program
 
 # lets autocomplete the --world option
 tab-world () {
