@@ -184,7 +184,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	cmd-uninstall () { # Remove a previously installed or linked app
 		local link=$BASHKIT_BIN/$1
-		[ ! -e $link ] && error app not found
+		[ ! -e $link ] && not opt --force && error app not found
 		rm -f $link
 	}
 
