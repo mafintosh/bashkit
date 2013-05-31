@@ -1,10 +1,10 @@
 #!/bin/bash
 
 CWD="$PWD"
-ARGV="$*"
-ARGV_LIST=($@)
+ARGV=("$@")
 OPTS=()
 CMD=$1
+IFS_DEFAULT=$IFS
 
 cd $(dirname $(readlink $0 || echo $0))
 DIRNAME=$PWD
@@ -35,11 +35,12 @@ opt-find () {
 	local name=${1//-/}
 	local opt_name=opt_$name
 	local found=false
-	for opt in $@; do
-		for arg in ${ARGV_LIST[@]}; do
+	local IFS=$IFS_DEFAULT
+	for opt in "$@"; do
+		for arg in "${ARGV[@]}"; do
 			[ "$opt" = "$arg" ] && found=true && printf -v $opt_name true && continue
 			$found && [ "${arg:0:1}" = "-" ] && break 2
-			$found && printf -v $opt_name $arg && break 2
+			$found && printf -v $opt_name "$arg" && break 2
 		done
 	done
 	for alias in ${@:2}; do
@@ -58,7 +59,7 @@ opt () {
 	local name=opt_${1//-/}
 	[ $# = 1 ] && [ "${!name}" != "" ] && return 0
 	OPTS+=(${@//,[^ ]*/})
-	for group in $@; do
+	for group in "$@"; do
 		local IFS="="
 		opt-find-def $group
 	done
@@ -69,7 +70,6 @@ print-help () {
 	local app=$(basename $0)
 	local cmds=$(__commands)
 	local max=0
-
 	for cmd in $cmds; do
 		[ ${#cmd} -gt $max ] && max=${#cmd}
 	done
@@ -135,11 +135,11 @@ run () {
 		return 0
 	fi
 	if silent type cmd-$CMD; then
-		cmd-$CMD ${ARGV_LIST[@]:1}
+		cmd-${ARGV[0]} "${ARGV[@]:1}"
 		return $?
 	fi
 	if silent type cmd; then
-		cmd $*
+		cmd "${ARGV[@]}"
 		return $?
 	fi
 
