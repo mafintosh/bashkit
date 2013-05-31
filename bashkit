@@ -2,7 +2,7 @@
 
 CWD="$PWD"
 ARGV="$*"
-ARGV_LIST=($*)
+ARGV_LIST=($@)
 OPTS=()
 CMD=$1
 
@@ -35,7 +35,7 @@ opt-find () {
 	local name=${1//-/}
 	local opt_name=opt_$name
 	local found=false
-	for opt in $*; do
+	for opt in $@; do
 		for arg in ${ARGV_LIST[@]}; do
 			[ "$opt" = "$arg" ] && found=true && printf -v $opt_name true && continue
 			$found && [ "${arg:0:1}" = "-" ] && break 2
@@ -58,7 +58,7 @@ opt () {
 	local name=opt_${1//-/}
 	[ $# = 1 ] && [ "${!name}" != "" ] && return 0
 	OPTS+=(${@//,[^ ]*/})
-	for group in $*; do
+	for group in $@; do
 		local IFS="="
 		opt-find-def $group
 	done
@@ -94,8 +94,8 @@ __commands () {
 }
 
 __autocompletelist () {
-	if silent type $*; then
-		for word in $($*); do
+	if silent type $@; then
+		for word in $($@); do
 			echo $word
 		done
 		exit 0
