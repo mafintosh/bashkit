@@ -7,6 +7,7 @@ BASHKIT_REPO=git://github.com/mafintosh/bashkit.git
 
 git clone $BASHKIT_REPO $BASHKIT_INSTALL
 mkdir -p $BASHKIT_INSTALL/bin
+mkdir -p $BASHKIT_INSTALL/apps
 
 ln -s $BASHKIT_INSTALL/bashkit $BASHKIT_INSTALL/bin/bashkit
 

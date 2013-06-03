@@ -149,9 +149,9 @@ run () {
 
 if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
+	BASHKIT_APPS="$BASHKIT_INSTALL/apps"
 
 	opt --bin,-b --force,-f
-
 
 	not-root () {
 		[ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
@@ -159,7 +159,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	init-app () {
 		app_filename=$(basename $1)
-		local tmp=${app_filename/.sh/}
+		local tmp=${app_filename%.*}
 		app_bin=${opt_bin-$tmp}
 		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already exists
 	}
@@ -167,6 +167,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	cmd-link () { # Link a script for development
 		not-root
 		init-app $1
+		mkdir -p $BASHKIT_BIN $BASHKIT_APPS
 		local link=$BASHKIT_BIN/$app_bin
 		cd $(dirname $1)
 		rm -f $link
@@ -174,12 +175,16 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		chmod +x $PWD/$app_filename
 	}
 
-	cmd-ls () { # List all installed apps
+	cmd-list () { # List all installed apps
 		ls $BASHKIT_BIN | grep -v bashkit
 	}
 
 	tab-uninstall-1 () {
-		cmd-ls
+		cmd-list
+	}
+
+	tab-update-1 () {
+		cmd-list
 	}
 
 	cmd-selfdestruct () { # Remove bashkit from this machine
@@ -187,20 +192,34 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-uninstall () { # Remove a previously installed or linked app
+		[ "$1" = "" ] && error app is required
 		local link=$BASHKIT_BIN/$1
 		[ ! -e $link ] && not opt --force && error app not found
 		rm -f $link
+		rm -rf $BASHKIT_APPS/$1
 	}
 
-	cmd-install () { # Installs an app from a filename or url
+	cmd-install () { # Installs an app from a git repository
 		not-root
 		init-app $1
-		if [ -e $1 ]; then
-			cp $1 $BASHKIT_BIN/$app_bin
-		else
-			curl $1 > $BASHKIT_BIN/$app_bin
-		fi
-		chmod +x $BASHKIT_BIN/$app_bin
+		local app_dir=$BASHKIT_APPS/$app_bin
+		local repo=$1
+		[ "${repo%:}" = "$repo" ] && [ "${repo%@}" = "$repo" ] && [ ! -e $repo ] && repo="git://github.com/$repo.git"
+		git clone $repo $app_dir || return $?
+		for file in {main,$app_bin}{.sh,}; do
+			if [ -e $app_dir/$file ]; then
+				$FILENAME link $app_dir/$file --bin $app_bin --force
+				return $?
+			fi
+		done
+		$FILENAME uninstall $app_bin --force
+		error no install target found
+	}
+
+	cmd-update () { # Update and previously installed app
+		[ ! -e $BASHKIT_APPS/$1/.git ] && error app cannot be updated
+		cd $BASHKIT_APPS/$1
+		git pull
 	}
 
 	cmd-selfupdate () { # Upgrade bashkit to the newest available version
