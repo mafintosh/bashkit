@@ -152,7 +152,10 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	opt --bin,-b --force,-f
 
-	[ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
+
+	not-root () {
+		[ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
+	}
 
 	init-app () {
 		app_filename=$(basename $1)
@@ -162,6 +165,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-link () { # Link a script for development
+		not-root
 		init-app $1
 		local link=$BASHKIT_BIN/$app_bin
 		cd $(dirname $1)
@@ -189,6 +193,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-install () { # Installs an app from a filename or url
+		not-root
 		init-app $1
 		if [ -e $1 ]; then
 			cp $1 $BASHKIT_BIN/$app_bin
