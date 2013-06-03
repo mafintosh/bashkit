@@ -2,14 +2,27 @@
 
 CWD="$PWD"
 ARGV=("$@")
+ARGV_=()
 OPTS=()
-CMD=$1
 IFS_DEFAULT=$IFS
 
 cd $(dirname $(readlink $0 || echo $0))
 DIRNAME=$PWD
 FILENAME=$DIRNAME/$(basename $(readlink $0 || echo $0))
 cd $CWD
+
+__argv_ () {
+	while [ $# != 0 ]; do
+		if [ "${1:0:1}" = "-" ] && [ "${1:0:1}" != "$1" ]; then
+			shift; shift
+		else
+			ARGV_+=("$1")
+			shift
+		fi
+	done
+}
+
+__argv_ "${ARGV[@]}"
 
 silent () {
 	$* > /dev/null 2> /dev/null
@@ -53,7 +66,7 @@ opt-find () {
 
 opt () {
 	if [ "${1:0:1}" != "-" ]; then
-		[ "$CMD" != "$1" ] && return 1
+		[ "${ARGV_[0]}" != "$1" ] && return 1
 		shift
 	fi
 	local name=opt_${1//-/}
@@ -101,6 +114,7 @@ __autocompletelist () {
 		exit 0
 	fi
 }
+
 __autocomplete () {
 	if [ "${COMP_CUR:0:1}" = "-" ]; then
 		for opt in ${OPTS[@]}; do
@@ -134,12 +148,12 @@ run () {
 		print-help
 		return 0
 	fi
-	if silent type cmd-$CMD; then
-		cmd-${ARGV[0]} "${ARGV[@]:1}"
+	if silent type cmd-${ARGV_[0]}; then
+		cmd-${ARGV_[0]} "${ARGV_[@]:1}"
 		return $?
 	fi
 	if silent type cmd; then
-		cmd "${ARGV[@]}"
+		cmd "${ARGV_[@]}"
 		return $?
 	fi
 
