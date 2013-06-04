@@ -1,20 +1,36 @@
 #!/bin/bash
 
-BASHKIT_INSTALL="$HOME/.bashkit"
-BASHKIT_REPO=git://github.com/mafintosh/bashkit.git
+BASHKIT_INSTALL=/usr/local/bashkit
+BIN_FOLDER=/usr/local/bin
 
-[ -e $BASHKIT_INSTALL ] && echo already installed && exit 0
+MESSAGE_INFO="bashkit is being installed to $BASHKIT_INSTALL for the user $(whoami)"
 
-git clone $BASHKIT_REPO $BASHKIT_INSTALL
-mkdir -p $BASHKIT_INSTALL/bin
+echo $MESSAGE_INFO
+echo -e "\x1B[90m${MESSAGE_INFO//?/=}\x1B[39m"
+echo "Installation requires sudo permissions:"
+
+ME=$(whoami)
+
+sudo sh <<EOF
+	[ -e $BASHKIT_INSTALL ] && echo "\x1B[31mInstall folder is not empty\x1B[39m" && exit 1
+	echo "Installing now..."
+	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || (echo "\x1B[31mInstallation failed. Are you online?\x1B[39m" && exit 2)
+	chown -R $ME $BASHKIT_INSTALL
+	chown $ME $BIN_FOLDER
+EOF
+
+[ $? != 0 ] && exit 1
+
+ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
 mkdir -p $BASHKIT_INSTALL/apps
 
-ln -s $BASHKIT_INSTALL/bashkit $BASHKIT_INSTALL/bin/bashkit
+BASH_PROFILE="$HOME/.bash_profile"
+[ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bashrc"
 
-BASH_PROFILE="$HOME/.bashrc"
-[ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bash_profile"
+if cat $BASH_PROFILE 2> /dev/null | grep "## bashkit installation ##" > /dev/null; then
+	: # already linked in rc
+else
+	printf '\n## bashkit installation ##\n[ -e %s ] && . %s\n' $BASHKIT_INSTALL/bashrc $BASHKIT_INSTALL/bashrc >> $BASH_PROFILE
+fi
 
-cat $BASH_PROFILE 2> /dev/null | grep "## bashkit installation ##" > /dev/null && echo already linked && exit 0
-
-printf '\n## bashkit installation ##\n[ -e %s ] && . %s\n' $BASHKIT_INSTALL/bashrc $BASHKIT_INSTALL/bashrc >> $BASH_PROFILE
-echo installation complete
+echo "Installation complete. Try running 'bashkit'"

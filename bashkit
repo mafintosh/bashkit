@@ -162,6 +162,7 @@ run () {
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
+	BASHKIT_INSTALL="$DIRNAME"
 	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
 	BASHKIT_APPS="$BASHKIT_INSTALL/apps"
 
@@ -172,6 +173,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	init-app () {
+		mkdir -p $BASHKIT_BIN $BASHKIT_APPS
 		app_filename=$(basename $1)
 		local tmp=${app_filename%.*}
 		app_bin=${opt_bin-$tmp}
@@ -181,8 +183,8 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	cmd-link () { # Link a script for development
 		not-root
 		init-app $1
-		mkdir -p $BASHKIT_BIN $BASHKIT_APPS
 		local link=$BASHKIT_BIN/$app_bin
+		touch $BASHKIT_APPS/$app_bin
 		cd $(dirname $1)
 		rm -f $link
 		ln -s $PWD/$app_filename $link
