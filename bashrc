@@ -6,4 +6,11 @@ if complete &>/dev/null; then
 		complete -o default -F _bashkit_completion $app
 	done
 	complete -o default -F _bashkit_completion bashkit
+
+	BASHKIT_PATH=$(bashkit path)
+	bashkit () {
+		$BASHKIT_PATH "$@" || return $?
+		[ "$1" = "link" ] || [ "$1" = "install" ] && . $(bashkit rc)
+		return 0
+	}
 fi
