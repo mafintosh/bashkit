@@ -12,10 +12,14 @@ echo $MESSAGE_INFO
 echo -e "\x1B[90m${MESSAGE_INFO//?/=}\x1B[39m"
 echo "Installation requires sudo permissions:"
 
-sudo sh <<EOF
-	[ -e $BASHKIT_INSTALL ] && echo "\x1B[31mInstall folder is not empty\x1B[39m" && exit 1
+sudo bash <<EOF
+	error () {
+		echo -e "\x1B[31m\$*\x1B[39m" && exit 1
+	}
+
+	[ -e $BASHKIT_INSTALL ] && error "Install folder is not empty"
 	echo "Installing now..."
-	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || (echo "\x1B[31mInstallation failed. Are you online?\x1B[39m" && exit 2)
+	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || error "Installation failed. Are you online?""
 	chown -R $ME:$ME_GROUP $BASHKIT_INSTALL
 	chown $ME:$ME_GROUP $BIN_FOLDER
 EOF
