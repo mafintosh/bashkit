@@ -1,12 +1,9 @@
-#!/bin/bash
-
 BASHKIT_INSTALL=/usr/local/bashkit
 BIN_FOLDER=/usr/local/bin
-
 MESSAGE_INFO="bashkit is being installed to $BASHKIT_INSTALL for the user $(whoami)"
 
 echo $MESSAGE_INFO
-echo -e "\x1B[90m${MESSAGE_INFO//?/=}\x1B[39m"
+echo "\x1B[90m${MESSAGE_INFO//?/=}\x1B[39m"
 echo "Installation requires sudo permissions:"
 
 ME=$(whoami)
