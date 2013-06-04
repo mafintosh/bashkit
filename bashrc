@@ -5,4 +5,5 @@ if complete &>/dev/null; then
 	for app in $(ls /usr/local/bashkit/apps); do
 		complete -o default -F _bashkit_completion $app
 	done
+	complete -o default -F _bashkit_completion bashkit
 fi
