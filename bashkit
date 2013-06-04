@@ -218,7 +218,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		init-app $1
 		local app_dir=$BASHKIT_APPS/$app_bin
 		local repo=$1
-		[ "${repo%:}" = "$repo" ] && [ "${repo%@}" = "$repo" ] && [ ! -e $repo ] && repo="git://github.com/$repo.git"
+		[ "${repo/:/}" = "$repo" ] && [ "${repo/@/}" = "$repo" ] && [ ! -e $repo ] && repo="git://github.com/$repo.git"
 		git clone $repo $app_dir || return $?
 		for file in {main,$app_bin}{.sh,}; do
 			if [ -e $app_dir/$file ]; then
