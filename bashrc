@@ -1,5 +1,7 @@
-export PATH=$PATH:~/.bashkit/bin
-export BASHKIT_INSTALL=~/.bashkit
+if [ "$BASHKIT_INSTALL" != "" ]; then
+	export PATH=$PATH:~/.bashkit/bin
+	export BASHKIT_INSTALL=~/.bashkit
+fi
 
 if complete &>/dev/null; then
 	_bashkit_completion () {

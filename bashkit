@@ -245,5 +245,9 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		echo $FILENAME
 	}
 
+	cmd-rc () { # Print the path to the bashkit rc file
+		echo $DIRNAME/bashrc
+	}
+
 	run
 fi
