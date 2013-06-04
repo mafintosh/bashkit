@@ -204,6 +204,10 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-selfdestruct () { # Remove bashkit from this machine
+		for app in $(ls $BASHKIT_APPS); do
+			rm -f $BASHKIT_BIN/$app
+		done
+		rm -f $BASHKIT_BIN/bashkit
 		rm -rf $BASHKIT_INSTALL
 	}
 
