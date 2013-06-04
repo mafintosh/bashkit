@@ -20,6 +20,7 @@ EOF
 
 ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
 mkdir -p $BASHKIT_INSTALL/apps
+ln -s $BASHKIT_INSTALL/bashkit $BIN_FOLDER/bashkit
 
 BASH_PROFILE="$HOME/.bash_profile"
 [ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bashrc"
