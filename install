@@ -1,3 +1,5 @@
+#!/bin/bash
+
 BASHKIT_INSTALL=/usr/local/bashkit
 BIN_FOLDER=/usr/local/bin
 
