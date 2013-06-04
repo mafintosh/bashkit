@@ -1,4 +1,4 @@
-if [ "$BASHKIT_INSTALL" != "" ]; then
+if [ "$BASHKIT_INSTALL" = "" ]; then
 	export PATH=$PATH:~/.bashkit/bin
 	export BASHKIT_INSTALL=~/.bashkit
 fi
