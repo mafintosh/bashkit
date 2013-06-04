@@ -17,6 +17,7 @@ sudo bash <<EOF
 		echo -e "\x1B[31m\$*\x1B[39m" && exit 1
 	}
 
+	type git > /dev/null 2> /dev/null || error "git is required"
 	[ -e $BASHKIT_INSTALL ] && error "Install folder is not empty"
 	echo "Installing now..."
 	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || error "Installation failed. Are you online?"
