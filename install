@@ -1,19 +1,21 @@
 BASHKIT_INSTALL=/usr/local/bashkit
 BIN_FOLDER=/usr/local/bin
-MESSAGE_INFO="bashkit is being installed to $BASHKIT_INSTALL for the user $(whoami)"
+
+ME=$(whoami)
+ME_GROUP=$(id -g -n $ME)
+
+MESSAGE_INFO="bashkit is being installed to $BASHKIT_INSTALL for the user $ME"
 
 echo $MESSAGE_INFO
 echo -e "\x1B[90m${MESSAGE_INFO//?/=}\x1B[39m"
 echo "Installation requires sudo permissions:"
 
-ME=$(whoami)
-
 sudo sh <<EOF
 	[ -e $BASHKIT_INSTALL ] && echo "\x1B[31mInstall folder is not empty\x1B[39m" && exit 1
 	echo "Installing now..."
 	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || (echo "\x1B[31mInstallation failed. Are you online?\x1B[39m" && exit 2)
-	chown -R $ME $BASHKIT_INSTALL
-	chown $ME $BIN_FOLDER
+	chown -R $ME:$ME_GROUP $BASHKIT_INSTALL
+	chown $ME:$ME_GROUP $BIN_FOLDER
 EOF
 
 [ $? != 0 ] && exit 1
