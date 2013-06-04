@@ -251,5 +251,9 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		echo $DIRNAME/bashrc
 	}
 
+	cmd-dirname () { # Print the install dir of bashkit
+		echo $DIRNAME
+	}
+
 	run
 fi
