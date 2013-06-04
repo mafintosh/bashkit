@@ -173,6 +173,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	init-app () {
+		[ $# = 0 ] && error app is required
 		mkdir -p $BASHKIT_BIN $BASHKIT_APPS
 		app_filename=$(basename $1)
 		local tmp=${app_filename%.*}
