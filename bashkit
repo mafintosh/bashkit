@@ -186,7 +186,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	app-not-exists () {
-		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already exists
+		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already installed
 	}
 
 	cmd-link () { # Link a script for development
@@ -203,6 +203,12 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	cmd-list () { # List all installed apps
 		ls $BASHKIT_APPS | cat -
+	}
+
+	cmd-has () { # Test whether an app was installed with bashkit
+		app-init
+		[ -e $BASHKIT_BIN/$1 ] && return 0
+		return 1
 	}
 
 	tab-uninstall-1 () {
