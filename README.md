@@ -6,7 +6,7 @@ Make command-line apps in bash in no time will full autocompletion and command r
 
 Run the following command to install bashkit
 
-	curl -s https://raw.github.com/mafintosh/bashkit/master/install | bash && . $(bashkit rc)
+	curl -fs https://raw.github.com/mafintosh/bashkit/master/install | bash && . $(bashkit rc)
 
 This will install a commandline tool called `bashkit`.
 Run `bashkit` to print all available options.
