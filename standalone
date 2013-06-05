@@ -1,3 +1,4 @@
+#!/bin/bash
 if ! which bashkit > /dev/null 2> /dev/null; then
 	printf "__NAME__ requires bashkit which is not installed...\n\n"
 	curl -fs https://raw.github.com/mafintosh/bashkit/master/install | bash
