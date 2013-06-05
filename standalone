@@ -4,7 +4,6 @@ if ! which bashkit > /dev/null 2> /dev/null; then
 	[ $? != 0 ] && exit 1
 	printf "\n"
 fi
-BASHKIT_COLORS=true
 BASHKIT_APP_INSTALL="bashkit install __REPO__"
 [ ! -O "$(bashkit dirname)/bin" ] && BASHKIT_APP_INSTALL="sudo $BASHKIT_APP_INSTALL"
 printf "\x1B[90m$BASHKIT_APP_INSTALL\x1B[39m\n"

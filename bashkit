@@ -171,6 +171,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	BASHKIT_APPS="$BASHKIT_INSTALL/apps"
 
 	opt --bin,-b --force,-f
+	opt --colors && BASHKIT_COLORS=true
 
 	not-root () {
 		[ ! -O $BASHKIT_BIN ] && [ "$(whoami)" = "root" ] && not opt --force && error "you are root and do not own bin\nuse --force to continue"
