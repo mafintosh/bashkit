@@ -33,7 +33,7 @@ error () {
 	if [ "$BASHKIT_COLORS" = "" ]; then
 		echo -e $* >&2
 	else
-		echo -e "\x1B[31m\$*\x1B[39m" >&2
+		echo -e "\x1B[31m$*\x1B[39m" >&2
 	fi
 	exit 1
 }
