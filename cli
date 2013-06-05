@@ -38,16 +38,6 @@ cmd-list () { # List all installed apps
 	ls $BASHKIT_APPS | cat -
 }
 
-tab-has-1 () {
-	cmd-list
-}
-
-cmd-has () { # Test whether an app was installed with bashkit
-	app-init $1
-	[ -e $BASHKIT_BIN/$1 ] && return 0
-	return 1
-}
-
 cmd-selfdestruct () { # Remove bashkit from this machine
 	for app in $(ls $BASHKIT_APPS); do
 		rm -f $BASHKIT_BIN/$app
