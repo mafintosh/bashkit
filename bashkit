@@ -132,11 +132,13 @@ __autocomplete () {
 		COMP_PREV="--${!opt_alias}"
 	fi
 	if [ "${COMP_PREV:0:2}" = "--" ]; then
-		__autocompletelist tab-${COMP_PREV:2}
+		__autocompletelist tab-opt-${COMP_PREV:2}
 		exit 0
 	fi
 
-	__autocompletelist tab-$COMP_PREV-$(($COMP_CWORD-1))
+	__autocompletelist tab-${ARGV_[0]}-$(($COMP_CWORD-1))
+	__autocompletelist tab-${ARGV_[0]}
+
 	__autocompletelist tab-$COMP_CWORD
 
 	[ "$COMP_CWORD" = "1" ] && __commands && exit 0

@@ -71,8 +71,12 @@ to define a custom tab completion method.
 opt --world,-w # lets add a --world (-w for short) option to our program
 
 # lets autocomplete the --world option
-tab-world () {
+tab-opt-world () {
 	echo world welt verden mundo # print out available options
+}
+
+tab-hello () {
+	: # in here we could complete the hello command arguments
 }
 
 cmd-hello () {
