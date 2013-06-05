@@ -121,6 +121,7 @@ cmd-dirname () { # Print the install dir of bashkit
 cmd () {
 	local FILENAME=$DIRNAME/cli
 	print-help
+	exit 1
 }
 
 opt --help && cmd && exit 0
