@@ -204,7 +204,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-list () { # List all installed apps
-		ls $BASHKIT_APPS
+		ls $BASHKIT_APPS | cat -
 	}
 
 	tab-uninstall-1 () {
