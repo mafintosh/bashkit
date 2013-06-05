@@ -169,7 +169,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	opt --bin,-b --force,-f
 
 	not-root () {
-		[ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
+		[ ! -O $BASHKIT_BIN ] && [ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
 	}
 
 	init-app () {

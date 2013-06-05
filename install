@@ -22,7 +22,6 @@ sudo bash <<EOF
 	echo "Installing now..."
 	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || error "Installation failed. Are you online?"
 	chown -R $ME:$ME_GROUP $BASHKIT_INSTALL
-	chown $ME:$ME_GROUP $BIN_FOLDER
 EOF
 
 [ $? != 0 ] && exit 1
