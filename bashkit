@@ -157,6 +157,14 @@ run () {
 		cmd-${ARGV_[0]} "${ARGV_[@]:1}"
 		return $?
 	fi
+	if silent type sudo-cmd-${ARGV_[0]}; then
+		if [ $EUID = 0 ]; then
+			sudo-cmd-${ARGV_[0]} "${ARGV_[@]}"
+		else
+			sudo $FILENAME "${ARGV}"
+		fi
+		return $?
+	fi
 	if silent type cmd; then
 		cmd "${ARGV_[@]}"
 		return $?
@@ -175,7 +183,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	opt --colors && BASHKIT_COLORS=true
 
 	not-root () {
-		[ ! -O $BASHKIT_BIN ] && [ "$(whoami)" = "root" ] && not opt --force && error "you are root and do not own bin\nuse --force to continue"
+		[ ! -O $BASHKIT_BIN ] && [ $EUID = 0 ] && not opt --force && error "you are root and do not own bin\nuse --force to continue"
 	}
 
 	app-init () {
