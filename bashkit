@@ -206,7 +206,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	}
 
 	cmd-has () { # Test whether an app was installed with bashkit
-		app-init
+		app-init $1
 		[ -e $BASHKIT_BIN/$1 ] && return 0
 		return 1
 	}
