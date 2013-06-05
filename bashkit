@@ -30,24 +30,16 @@ silent () {
 }
 
 error () {
-	echo -e $* >&2
+	if [ "$BASHKIT_COLORS" = "" ]; then
+		echo -e $* >&2
+	else
+		echo -e "\x1B[31m\$*\x1B[39m" >&2
+	fi
 	exit 1
 }
 
 not () {
 	$* && return 1 || return 0
-}
-
-cursor-hide() {
-	printf "\e[?25l"
-}
-
-cursor-show() {
-	printf "\e[?25h"
-}
-
-cursor-up () {
-	printf "\033[1A\033[2K"
 }
 
 opt-find-def () {
@@ -177,6 +169,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	BASHKIT_INSTALL="$DIRNAME"
 	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
 	BASHKIT_APPS="$BASHKIT_INSTALL/apps"
+	BASHKIT_COLORS=true
 
 	opt --bin,-b --force,-f
 
@@ -184,17 +177,21 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		[ ! -O $BASHKIT_BIN ] && [ "$(whoami)" = "root" ] && not opt --force && error "you are root and do not own bin\nuse --force to continue"
 	}
 
-	init-app () {
+	app-init () {
 		[ $# = 0 ] && error app is required
 		app_filename=$(basename $1)
 		local tmp=${app_filename%.*}
 		app_bin=${opt_bin-$tmp}
+	}
+
+	app-not-exists () {
 		[ -e $BASHKIT_BIN/$app_bin ] && not opt --force && error app already exists
 	}
 
 	cmd-link () { # Link a script for development
 		not-root
-		init-app $1
+		app-init $1
+		app-not-exists
 		local link=$BASHKIT_BIN/$app_bin
 		touch $BASHKIT_APPS/$app_bin
 		cd $(dirname $1)
@@ -233,9 +230,10 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	cmd-install () { # Installs an app from a git repository
 		not-root
-		init-app $1
+		app-init $1
+		app-not-exists
+		local repo=${1/https:\/\/github.com\//}
 		local app_dir=$BASHKIT_APPS/$app_bin
-		local repo=$1
 		[ "${repo/:/}" = "$repo" ] && [ "${repo/@/}" = "$repo" ] && [ ! -e $repo ] && repo="git://github.com/$repo.git"
 		git clone $repo $app_dir || return $?
 		for file in {main,$app_bin}{.sh,}; do
@@ -252,6 +250,11 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		[ ! -e $BASHKIT_APPS/$1/.git ] && error app cannot be updated
 		cd $BASHKIT_APPS/$1
 		git pull
+	}
+
+	cmd-standalone () { # Generate installer that can be used without bashkit
+		app-init $1
+		cat $DIRNAME/standalone | sed "s|__NAME__|$app_bin|" | sed "s|__REPO__|$1|"
 	}
 
 	cmd-selfupdate () { # Upgrade bashkit to the newest available version
