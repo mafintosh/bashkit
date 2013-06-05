@@ -18,7 +18,7 @@ The following program will print hello world.
 
 ``` sh
 #!/bin/bash
-. $(bashkit path) # include bashkit in this program
+. $(which bashkit) # include bashkit in this program
 
 cmd-hello () {
 	# this is the hello command

@@ -106,10 +106,6 @@ cmd-selfupdate () { # Upgrade bashkit to the newest available version
 	git pull
 }
 
-cmd-path () { # Print the include path of bashkit
-	echo $FILENAME
-}
-
 cmd-rc () { # Print the path to the bashkit rc file
 	echo $DIRNAME/bashrc
 }
