@@ -205,18 +205,14 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		ls $BASHKIT_APPS | cat -
 	}
 
+	tab-has-1 () {
+		cmd-list
+	}
+
 	cmd-has () { # Test whether an app was installed with bashkit
 		app-init $1
 		[ -e $BASHKIT_BIN/$1 ] && return 0
 		return 1
-	}
-
-	tab-uninstall-1 () {
-		cmd-list
-	}
-
-	tab-update-1 () {
-		cmd-list
 	}
 
 	cmd-selfdestruct () { # Remove bashkit from this machine
@@ -225,6 +221,10 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		done
 		rm -f $BASHKIT_BIN/bashkit
 		rm -rf $BASHKIT_INSTALL
+	}
+
+	tab-uninstall-1 () {
+		cmd-list
 	}
 
 	cmd-uninstall () { # Remove a previously installed or linked app
@@ -251,6 +251,10 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 		done
 		$FILENAME uninstall $app_bin --force
 		error no install target found
+	}
+
+	tab-update-1 () {
+		cmd-list
 	}
 
 	cmd-update () { # Update and previously installed app
