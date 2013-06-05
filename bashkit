@@ -30,7 +30,7 @@ silent () {
 }
 
 error () {
-	echo $* >&2
+	echo -e $* >&2
 	exit 1
 }
 
@@ -169,12 +169,11 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	opt --bin,-b --force,-f
 
 	not-root () {
-		[ ! -O $BASHKIT_BIN ] && [ "$(whoami)" = "root" ] && not opt --force && error you are sudo. use --force to continue
+		[ ! -O $BASHKIT_BIN ] && [ "$(whoami)" = "root" ] && not opt --force && error "you are root and do not own bin\nuse --force to continue"
 	}
 
 	init-app () {
 		[ $# = 0 ] && error app is required
-		mkdir -p $BASHKIT_BIN $BASHKIT_APPS
 		app_filename=$(basename $1)
 		local tmp=${app_filename%.*}
 		app_bin=${opt_bin-$tmp}
