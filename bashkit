@@ -169,7 +169,6 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 	BASHKIT_INSTALL="$DIRNAME"
 	BASHKIT_BIN="$BASHKIT_INSTALL/bin"
 	BASHKIT_APPS="$BASHKIT_INSTALL/apps"
-	BASHKIT_COLORS=true
 
 	opt --bin,-b --force,-f
 
