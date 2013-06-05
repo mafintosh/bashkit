@@ -18,18 +18,19 @@ sudo bash <<EOF
 	}
 
 	type git > /dev/null 2> /dev/null || error "git is required"
-	[ -e $BASHKIT_INSTALL ] && error "Install folder is not empty"
+	[ -e $BASHKIT_INSTALL ] && error "$BASHKIT_INSTALL is not empty"
 	echo "Installing now..."
 	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || error "Installation failed. Are you online?"
+	ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
+	rm -f $BIN_FOLDER/bashkit
+	ln -s $BASHKIT_INSTALL/bashkit $BIN_FOLDER/bashkit
 	chown -R $ME:$ME_GROUP $BASHKIT_INSTALL
 EOF
 
 [ $? != 0 ] && exit 1
 
-ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
+
 mkdir -p $BASHKIT_INSTALL/apps
-rm -f $BIN_FOLDER/bashkit
-ln -s $BASHKIT_INSTALL/bashkit $BIN_FOLDER/bashkit
 
 BASH_PROFILE="$HOME/.bash_profile"
 [ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bashrc"
@@ -40,4 +41,5 @@ else
 	printf '\n## bashkit installation ##\n[ -e %s ] && . %s\n' $BASHKIT_INSTALL/bashrc $BASHKIT_INSTALL/bashrc >> $BASH_PROFILE
 fi
 
+printf "\033[1A\033[2K"
 echo "Installation complete. Try running 'bashkit'"
