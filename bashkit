@@ -265,7 +265,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$_" = "$0" ]; then
 
 	cmd-standalone () { # Generate installer that can be used without bashkit
 		app-init $1
-		cat $DIRNAME/standalone | sed "s|__NAME__|$app_bin|" | sed "s|__REPO__|$1|"
+		cat $DIRNAME/standalone | sed "s|__NAME__|$app_bin|g" | sed "s|__REPO__|$1|g"
 	}
 
 	cmd-selfupdate () { # Upgrade bashkit to the newest available version
