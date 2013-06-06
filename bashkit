@@ -146,6 +146,17 @@ __autocomplete () {
 	__autocompletelist tab
 }
 
+run-shift () {
+	if silent type cmd-${ARGV[0]} && silent type sudo-cmd-${ARGV[0]}; then
+		ARGV_=("${ARGV_[@]:1}")
+		[ ${#ARGV_[@]} = 0 ] && return 0
+	else
+		ARGV_=("${ARGV_[0]}" "${ARGV_[@]:2}")
+		[ ${#ARGV_[@]} = 1 ] && return 0
+	fi
+	run
+}
+
 run () {
 	if opt --autocomplete; then
 		__autocomplete | grep "^$COMP_CUR"
