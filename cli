@@ -1,8 +1,9 @@
 #!/bin/bash
 
 BASHKIT_INSTALL="$DIRNAME"
-BASHKIT_BIN="$BASHKIT_INSTALL/bin"
 BASHKIT_APPS="$BASHKIT_INSTALL/apps"
+BASHKIT_BIN="$BASHKIT_INSTALL/bin"
+BASHKIT_BIN=$(readlink "$BASHKIT_BIN" || echo "$BASHKIT_BIN")
 
 opt --bin,-b --force,-f
 opt --colors && BASHKIT_COLORS=true
@@ -51,6 +52,7 @@ tab-uninstall-1 () {
 }
 
 cmd-uninstall () { # Remove a previously installed or linked app
+	not-root
 	[ "$1" = "" ] && error app is required
 	local link=$BASHKIT_BIN/$1
 	[ ! -e $link ] && not opt --force && error app not found
@@ -62,10 +64,18 @@ cmd-install () { # Installs an app from a git repository
 	not-root
 	app-init $1
 	app-not-exists
+	opt --force && $FILENAME uninstall $app_bin --force
+
 	local repo=${1/https:\/\/github.com\//}
 	local app_dir=$BASHKIT_APPS/$app_bin
 	[ "${repo/:/}" = "$repo" ] && [ "${repo/@/}" = "$repo" ] && [ ! -e $repo ] && repo="git://github.com/$repo.git"
+
 	git clone $repo $app_dir || return $?
+
+	if [ $EUID = 0 ]; then
+		local bashkit_owner=($(ls -ld $BASHKIT_INSTALL))
+		chown -R ${bashkit_owner[2]}:${bashkit_owner[3]} $app_dir
+	fi
 	for file in {main,$app_bin}{.sh,}; do
 		if [ -e $app_dir/$file ]; then
 			$FILENAME link $app_dir/$file --bin $app_bin --force
