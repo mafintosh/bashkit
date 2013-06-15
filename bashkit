@@ -107,6 +107,7 @@ print-help () {
 }
 
 __commands () {
+	declare -F | silent grep 'cmd-' || return 1
 	declare -F | grep 'cmd-' | sed 's/.*cmd-//' | sed 's/ .*//'
 	return $?
 }
