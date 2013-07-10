@@ -51,21 +51,21 @@ opt-find-def () {
 opt-find () {
 	local default=$1 && shift
 	local name=${1//-/}
-	local opt_name=opt_$name
+	local name_opt=opt_$name
 	local found=false
 	local IFS=$IFS_DEFAULT
 	for opt in "$@"; do
 		for arg in "${ARGV[@]}"; do
-			[ "$opt" = "$arg" ] && found=true && printf -v $opt_name true && continue
+			[ "$opt" = "$arg" ] && found=true && printf -v $name_opt true && continue
 			$found && [ "${arg:0:1}" = "-" ] && break 2
-			$found && printf -v $opt_name "$arg" && break 2
+			$found && printf -v $name_opt "$arg" && break 2
 		done
 	done
 	for alias in ${@:2}; do
 		printf -v opt_alias_${alias//-/} $name
 	done
 	$found && return 0
-	[ "$default" != "-" ] && printf -v $opt_name $default && return 0
+	[ "$default" != "-" ] && printf -v $name_opt $default && return 0
 	return 1
 }
 
