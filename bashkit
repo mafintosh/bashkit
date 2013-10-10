@@ -113,7 +113,7 @@ __commands () {
 }
 
 __autocompletelist () {
-	if silent declare -f -F $@; then
+	if silent type $@; then
 		for word in $($@); do
 			echo $word
 		done
@@ -148,7 +148,7 @@ __autocomplete () {
 }
 
 run-shift () {
-	if silent declare -f -F cmd-${ARGV[0]} && silent declare -f -F sudo-cmd-${ARGV[0]}; then
+	if silent type cmd-${ARGV[0]} && silent type sudo-cmd-${ARGV[0]}; then
 		ARGV_=("${ARGV_[@]:1}")
 		[ ${#ARGV_[@]} = 0 ] && return 0
 	else
@@ -167,11 +167,11 @@ run () {
 		print-help
 		return 0
 	fi
-	if silent declare -f -F cmd-${ARGV_[0]}; then
+	if silent type cmd-${ARGV_[0]}; then
 		cmd-${ARGV_[0]} "${ARGV_[@]:1}"
 		return $?
 	fi
-	if silent declare -f -F sudo-cmd-${ARGV_[0]}; then
+	if silent type sudo-cmd-${ARGV_[0]}; then
 		if [ $EUID = 0 ]; then
 			sudo-cmd-${ARGV_[0]} "${ARGV_[@]:1}"
 		else
@@ -179,7 +179,7 @@ run () {
 		fi
 		return $?
 	fi
-	if silent declare -f -F cmd; then
+	if silent type cmd; then
 		cmd "${ARGV_[@]}"
 		return $?
 	fi
