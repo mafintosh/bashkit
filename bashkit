@@ -175,7 +175,7 @@ run () {
 		if [ $EUID = 0 ]; then
 			sudo-cmd-${ARGV_[0]} "${ARGV_[@]:1}"
 		else
-			sudo $FILENAME -E "${ARGV[@]}"
+			sudo -E $FILENAME "${ARGV[@]}"
 		fi
 		return $?
 	fi
