@@ -104,6 +104,7 @@ cmd-standalone () { # Generate installer that can be used without bashkit
 }
 
 cmd-selfupdate () { # Upgrade bashkit to the newest available version
+	check-permissions
 	cd $BASHKIT_INSTALL
 	git pull
 }
