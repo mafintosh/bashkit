@@ -3,33 +3,25 @@
 BASHKIT_INSTALL=/usr/local/bashkit
 BIN_FOLDER=/usr/local/bin
 
-ME=$(whoami)
-ME_GROUP=$(id -g -n $ME)
-
-MESSAGE_INFO="bashkit is being installed to $BASHKIT_INSTALL for the user $ME"
+MESSAGE_INFO="bashkit is being installed to $BASHKIT_INSTALL"
 
 echo $MESSAGE_INFO
 echo -e "\x1B[90m${MESSAGE_INFO//?/=}\x1B[39m"
-echo "Installation requires sudo permissions:"
 
-sudo bash <<EOF
-	error () {
-		echo -e "\x1B[31m\$*\x1B[39m" && exit 1
-	}
+error () {
+	echo -e "\x1B[31m$*\x1B[39m" && exit 1
+}
 
-	type git > /dev/null 2> /dev/null || error "git is required"
-	[ -e $BASHKIT_INSTALL ] && error "$BASHKIT_INSTALL is not empty"
-	echo "Installing now..."
-	git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || error "Installation failed. Are you online?"
-	ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
-	rm -f $BIN_FOLDER/bashkit
-	ln -s $BASHKIT_INSTALL/bashkit $BIN_FOLDER/bashkit
-	chown -R $ME:$ME_GROUP $BASHKIT_INSTALL
-EOF
+[ $EUID != 0 ] && [ ! -O "$BASHKIT_INSTALL/.." ] && error "sudo permissions required"
+[ $EUID != 0 ] && [ ! -O "$BIN_FOLDER" ] && error "sudo permissions required"
 
-[ $? != 0 ] && exit 1
-
-
+type git > /dev/null 2> /dev/null || error "git is required"
+[ -e $BASHKIT_INSTALL ] && error "$BASHKIT_INSTALL is not empty"
+echo "Installing now..."
+git clone -q git://github.com/mafintosh/bashkit.git $BASHKIT_INSTALL 2> /dev/null || error "Installation failed. Are you online?"
+ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
+rm -f $BIN_FOLDER/bashkit
+ln -s $BASHKIT_INSTALL/bashkit $BIN_FOLDER/bashkit
 mkdir -p $BASHKIT_INSTALL/apps
 
 BASH_PROFILE="$HOME/.bash_profile"
