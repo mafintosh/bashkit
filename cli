@@ -8,8 +8,9 @@ BASHKIT_BIN=$(readlink "$BASHKIT_BIN" || echo "$BASHKIT_BIN")
 opt --bin,-b --force,-f
 opt --colors && BASHKIT_COLORS=true
 
-not-root () {
+check-permissions () {
 	[ ! -O $BASHKIT_BIN ] && [ $EUID = 0 ] && not opt --force && error "you are root and do not own bin\nuse --force to continue"
+	[ ! -O $BASHKIT_BIN ] && [ $EUID != 0 ] && not opt --force && error "you do not own bin\nuse sudo or --force to continue"
 }
 
 app-init () {
@@ -24,7 +25,7 @@ app-not-exists () {
 }
 
 cmd-link () { # Link a script for development
-	not-root
+	check-permissions
 	app-init $1
 	app-not-exists
 	local link=$BASHKIT_BIN/$app_bin
@@ -52,7 +53,7 @@ tab-uninstall-1 () {
 }
 
 cmd-uninstall () { # Remove a previously installed or linked app
-	not-root
+	check-permissions
 	[ "$1" = "" ] && error app is required
 	local link=$BASHKIT_BIN/$1
 	[ ! -e $link ] && not opt --force && error app not found
@@ -61,7 +62,7 @@ cmd-uninstall () { # Remove a previously installed or linked app
 }
 
 cmd-install () { # Installs an app from a git repository
-	not-root
+	check-permissions
 	app-init $1
 	app-not-exists
 	opt --force && $FILENAME uninstall $app_bin --force
