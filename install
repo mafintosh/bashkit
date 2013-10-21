@@ -26,11 +26,10 @@ $SUDO_CMD bash <<EOF
 	ln -s $BIN_FOLDER $BASHKIT_INSTALL/bin
 	rm -f $BIN_FOLDER/bashkit
 	ln -s $BASHKIT_INSTALL/bashkit $BIN_FOLDER/bashkit
+	mkdir -p $BASHKIT_INSTALL/apps
 EOF
 
 [ $? != 0 ] && exit 1
-
-mkdir -p $BASHKIT_INSTALL/apps
 
 BASH_PROFILE="$HOME/.bash_profile"
 [ ! -e $BASH_PROFILE ] && BASH_PROFILE="$HOME/.bashrc"
