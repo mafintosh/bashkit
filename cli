@@ -92,6 +92,7 @@ tab-update-1 () {
 }
 
 cmd-update () { # Update and previously installed app
+	check-permissions
 	[ ! -e $BASHKIT_APPS/$1/.git ] && error app cannot be updated
 	cd $BASHKIT_APPS/$1
 	git pull
